@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Products — shopwithsmilee</title>
+  <link rel="icon" href="logo.png" type="image/png">
+
+
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      padding-top: 20px;
+    }
+
+    .filter-btn {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Segoe UI', sans-serif;
+      transition: var(--transition);
+      border-radius: 2px;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cursor"></div>
+  <div class="cursor-dot"></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <header>
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="shopwithsmilee">
+        <span>shopwithsmilee</span>
+      </a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
+        <button class="nav-icon" style="position:relative;">🛒<div class="cart-badge"></div></button>
+        <button class="nav-icon" onclick="window.location='index.html';">👤</button>
+      </div>
+    </nav>
+  </header>
+
+  <div style="padding: 120px 6% 80px;">
+    <p class="section-label">Complete Collection</p>
+    <h1 class="section-title">All Products</h1>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+      <button class="filter-btn" onclick="filterProducts('crochet', this)">Crochet</button>
+      <button class="filter-btn" onclick="filterProducts('resin', this)">Resin Art</button>
+      <button class="filter-btn" onclick="filterProducts('jewellery', this)">Jewellery</button>
+      <button class="filter-btn" onclick="filterProducts('bags', this)">Bags & Wallets</button>
+      <button class="filter-btn" onclick="filterProducts('gifts', this)">Gifts</button>
+      <button class="filter-btn" onclick="filterProducts('women', this)">Women</button>
+      <button class="filter-btn" onclick="filterProducts('men', this)">Men</button>
+    </div>
+
+    <div class="products-grid" id="allProducts">
+
+    </div>
+  </div>
+
+  <footer style="background:var(--bg2);border-top:1px solid var(--border);padding:30px 6%;text-align:center;">
+    <p style="font-size:12px;color:var(--text3);font-family:'Segoe UI',sans-serif;letter-spacing:2px;">
+      shopwithsmilee — Discover Joy | Made with ♥
+    </p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    const allProducts = window.shopProducts || [
+      { id: 'handmade-tote-bag', name: 'Handmade Tote Bag', category: 'crochet', price: '₹1,299', img: 'https://i.pinimg.com/1200x/9e/17/bb/9e17bbd8501a84c3ba8adc063e0e12e3.jpg' },
+      { id: 'resin-bookmark', name: 'Resin Bookmark', category: 'resin', price: '₹899', img: 'https://i.pinimg.com/1200x/8d/f5/cc/8df5cc351829e4ac20a282f4208ee265.jpg' },
+      { id: 'earrings', name: 'Earrings', category: 'jewellery', price: '₹549', img: 'https://i.pinimg.com/1200x/d7/65/47/d76547a6725f466234883b1d8cabcb10.jpg' },
+      { id: 'bag', name: 'Bag', category: 'bags', price: '₹749', img: 'https://i.pinimg.com/1200x/82/38/9e/82389eec47c237d0fd8855c1ccf81f16.jpg' },
+      { id: 'bottle', name: 'Bottle', category: 'gifts', price: '₹649', img: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80' },
+      { id: 'jacket', name: 'Jacket', category: 'men', price: '₹999', img: 'https://i.pinimg.com/736x/31/ce/56/31ce5621e7607691c1ad275d5434a175.jpg' },
+      { id: 'gift-box', name: 'Custom Gift Box', category: 'gifts', price: '₹1,499', img: 'https://i.pinimg.com/736x/dc/a3/c5/dca3c55ada4a19c87bbb351b8e697ade.jpg' },
+      { id: 'beaded-bracelet', name: 'Beaded Bracelet', category: 'jewellery', price: '₹399', img: 'https://tse3.mm.bing.net/th/id/OIP.QENkMEyNWrg93ZJokPGT1wHaJP?rs=1&pid=ImgDetMain&o=7&rm=3' },
+      { id: 'crochet-scarf', name: 'Crochet Scarf', category: 'crochet', price: '₹849', img: 'https://i.pinimg.com/736x/49/d4/4e/49d44ee86c27da0428bfda907baa7f34.jpg' },
+      { id: 'resin-keychain-set', name: 'Resin Keychain Set', category: 'resin', price: '₹299', img: 'https://resincraftsblog.com/wp-content/uploads/2022/01/PhotoKeychains.jpg' },
+    ];
+
+    function renderProducts(filter = 'all') {
+      const grid = document.getElementById('allProducts');
+      const filtered = filter === 'all' ? allProducts : allProducts.filter(p => p.category === filter);
+      grid.innerHTML = filtered.map(p => `
+    <a href="product.html?id=${p.id}" class="product-card fade">
+      <div class="card-img-wrap">
+        <img src="${p.image || p.img}" alt="${p.name}" loading="lazy">
+      </div>
+  
+      <div class="card-info">
+        <p class="card-tag">${p.category}</p>
+        <p class="card-name">${p.name}</p>
+        <p class="card-price">${p.price}</p>
+      </div>
+    </a>
+  `).join('');
+      setTimeout(() => document.querySelectorAll('.fade').forEach(el => el.classList.add('show')), 50);
+    }
+
+    function filterProducts(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderProducts(cat);
+    }
+
+    function initProductsCategory() {
+      const params = new URLSearchParams(window.location.search);
+      const category = params.get('category') || 'all';
+      const selectedBtn = document.querySelector(`.filter-btn[onclick="filterProducts('${category}', this)"]`);
+      if (selectedBtn) {
+        selectedBtn.classList.add('active');
+      }
+      renderProducts(category);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { initProductsCategory(); updateCartBadge(); });
+  </script>
+</body>
+
+</html>

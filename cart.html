@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart — shopwithsmilee</title>
+  <link rel="icon" href="logo.png" type="image/png">
+
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 40px;
+      padding: 120px 6% 80px;
+      align-items: start;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .cart-item-name {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .cart-item-price {
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 18px;
+      transition: var(--transition);
+    }
+
+    .remove-btn:hover {
+      color: #e74c3c;
+    }
+
+    .order-summary {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 30px;
+      position: sticky;
+      top: 100px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text2);
+    }
+
+    .summary-row.total {
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 600;
+      border-bottom: none;
+      padding-top: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .cart-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .order-summary {
+        position: static;
+      }
+    }
+
+    }
+
+    .payment-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .payment-overlay.open {
+      display: flex;
+    }
+
+    .payment-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      width: 90%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .payment-header {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .payment-header h2 {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+
+    .payment-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .payment-close:hover {
+      color: var(--text);
+    }
+
+    .payment-body {
+      padding: 28px;
+    }
+
+    .payment-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .pay-tab {
+      flex: 1;
+      padding: 11px 8px;
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Segoe UI', sans-serif;
+      transition: var(--transition);
+    }
+
+    .pay-tab.active {
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .pay-panel {
+      display: none;
+    }
+
+    .pay-panel.active {
+      display: block;
+    }
+
+    .pay-field {
+      margin-bottom: 16px;
+    }
+
+    .pay-field label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .pay-field input,
+    .pay-field select {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    .pay-field input:focus,
+    .pay-field select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .pay-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .payment-total-bar {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+    }
+
+    .payment-total-bar .amt {
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .upi-apps {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+
+    .upi-app {
+      padding: 10px 18px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text2);
+      font-size: 13px;
+      font-family: 'Segoe UI', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: 2px;
+    }
+
+    .upi-app:hover,
+    .upi-app.selected {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pay-secure-note {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      margin-top: 12px;
+      letter-spacing: 1px;
+    }
+
+    .payment-success {
+      display: none;
+      padding: 50px 28px;
+      text-align: center;
+    }
+
+    .payment-success.show {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: popIn 0.5s ease;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0);
+      }
+
+      80% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .success-title {
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+    }
+
+    .success-order {
+      font-size: 13px;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .success-id {
+      font-size: 16px;
+      color: var(--accent);
+      font-family: 'Segoe UI', sans-serif;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cursor"></div>
+  <div class="cursor-dot"></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <header>
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="shopwithsmilee">
+        <span>shopwithsmilee</span>
+      </a>
+      <div class="nav-right">
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
+        <button class="nav-icon" style="position:relative;">🛒<div class="cart-badge"></div></button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="cart-layout">
+    <div>
+      <p class="section-label">Your Selection</p>
+      <h1 class="section-title">Shopping Cart</h1>
+      <div id="cartItems"></div>
+      <p id="emptyMsg"
+        style="display:none;color:var(--text3);font-family:'Segoe UI',sans-serif;font-size:14px;margin-top:30px;">
+        Your cart is empty. <a href="products.html" style="color:var(--accent);">Continue shopping</a>
+      </p>
+    </div>
+    <div class="order-summary">
+      <h3 style="font-size:18px;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+      <div class="summary-row"><span>Delivery</span><span id="deliveryCost">₹99</span></div>
+      <div class="summary-row"><span>Discount</span><span style="color:#2ed573;">-₹0</span></div>
+      <div class="summary-row total"><span>Total</span><span id="totalAmount">₹0</span></div>
+      <button class="btn btn-gold" style="width:100%;margin-top:20px;" onclick="openPayment()">Proceed to Checkout
+        🔒</button>
+      <a href="products.html" class="btn"
+        style="width:100%;display:block;text-align:center;margin-top:12px;box-sizing:border-box;">Continue Shopping</a>
+    </div>
+  </div>
+  <div class="payment-overlay" id="paymentOverlay" onclick="if(event.target===this)closePayment()">
+    <div class="payment-modal">
+      <div id="paymentFormSection">
+        <div class="payment-header">
+          <h2>🔒 Secure Checkout</h2>
+          <button class="payment-close" onclick="closePayment()">✕</button>
+        </div>
+        <div class="payment-body">
+          <div class="payment-total-bar">
+            <span>Order Total</span>
+            <span class="amt" id="payModalTotal">₹0</span>
+          </div>
+          <div class="payment-tabs">
+            <button class="pay-tab active" onclick="switchPayTab('card',this)">💳 Card</button>
+            <button class="pay-tab" onclick="switchPayTab('upi',this)">📱 UPI</button>
+            <button class="pay-tab" onclick="switchPayTab('netbanking',this)">🏦 Net Banking</button>
+            <button class="pay-tab" onclick="switchPayTab('cod',this)">💵 COD</button>
+          </div>
+          <div class="pay-panel active" id="panel-card">
+            <div class="pay-field">
+              <label>Card Number</label>
+              <input type="text" placeholder="4111 1111 1111 1111" maxlength="19" id="cardNum"
+                oninput="formatCard(this)">
+            </div>
+            <div class="pay-field">
+              <label>Cardholder Name</label>
+              <input type="text" placeholder="Name on card" id="cardName">
+            </div>
+            <div class="pay-field-row">
+              <div class="pay-field">
+                <label>Expiry</label>
+                <input type="text" placeholder="MM/YY" maxlength="5" id="cardExpiry" oninput="formatExpiry(this)">
+              </div>
+              <div class="pay-field">
+                <label>CVV</label>
+                <input type="text" placeholder="•••" maxlength="3" id="cardCvv">
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+              <span style="font-size:22px;">💳</span><span style="font-size:22px;">🏦</span>
+              <span
+                style="font-size:13px;color:var(--text3);font-family:'Segoe UI',sans-serif;align-self:center;margin-left:4px;">Visa,
+                Mastercard, RuPay accepted</span>
+            </div>
+            <button class="btn btn-gold" style="width:100%;" onclick="processPayment('card')">Pay Now</button>
+          </div>
+
+          <div class="pay-panel" id="panel-upi">
+            <p
+              style="font-size:12px;color:var(--text3);font-family:'Segoe UI',sans-serif;letter-spacing:1px;margin-bottom:12px;">
+              Select UPI App</p>
+            <div class="upi-apps">
+              <button class="upi-app" onclick="selectUPI(this,'GPay')">Google Pay</button>
+              <button class="upi-app" onclick="selectUPI(this,'PhonePe')">PhonePe</button>
+              <button class="upi-app" onclick="selectUPI(this,'Paytm')">Paytm</button>
+              <button class="upi-app" onclick="selectUPI(this,'BHIM')">BHIM UPI</button>
+            </div>
+            <div class="pay-field">
+              <label>Or enter UPI ID</label>
+              <input type="text" placeholder="yourname@upi" id="upiId">
+            </div>
+            <button class="btn btn-gold" style="width:100%;margin-top:8px;" onclick="processPayment('upi')">Pay via
+              UPI</button>
+          </div>
+
+          <div class="pay-panel" id="panel-netbanking">
+            <div class="pay-field">
+              <label>Select Bank</label>
+              <select id="bankSelect">
+                <option value="">-- Choose your bank --</option>
+                <option>State Bank of India</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>Axis Bank</option>
+                <option>Punjab National Bank</option>
+                <option>Kotak Mahindra Bank</option>
+                <option>Bank of Baroda</option>
+                <option>Canara Bank</option>
+              </select>
+            </div>
+            <button class="btn btn-gold" style="width:100%;margin-top:8px;"
+              onclick="processPayment('netbanking')">Proceed to Bank</button>
+          </div>
+
+          <div class="pay-panel" id="panel-cod">
+            <div
+              style="padding:20px;background:var(--bg3);border:1px solid var(--border);margin-bottom:20px;text-align:center;">
+              <div style="font-size:40px;margin-bottom:12px;">💵</div>
+              <p style="font-size:14px;color:var(--text2);font-family:'Segoe UI',sans-serif;line-height:1.6;">Pay with
+                cash when your order arrives at your doorstep. Extra ₹49 COD fee applies.</p>
+            </div>
+            <button class="btn btn-gold" style="width:100%;" onclick="processPayment('cod')">Confirm Cash on
+              Delivery</button>
+          </div>
+
+          <p class="pay-secure-note">🔒 256-bit SSL encrypted · Secured by Razorpay</p>
+        </div>
+      </div>
+
+      <div class="payment-success" id="paymentSuccess">
+        <div class="success-icon">✅</div>
+        <h2 class="success-title">Order Placed!</h2>
+        <p class="success-order">Your Order ID</p>
+        <p class="success-id" id="successOrderId">SWS2024XXX</p>
+        <p
+          style="font-size:13px;color:var(--text2);font-family:'Segoe UI',sans-serif;line-height:1.6;margin-bottom:24px;">
+          Thank you for shopping with <strong>shopwithsmilee</strong> 🎉<br>
+          You'll receive a confirmation shortly.
+        </p>
+        <button class="btn btn-gold" style="margin-bottom:12px;"
+          onclick="closePayment();window.location='index.html'">Back to Home</button>
+        <br>
+        <a href="index.html#tracking"
+          style="font-size:12px;color:var(--accent);font-family:'Segoe UI',sans-serif;letter-spacing:1px;"
+          onclick="closePayment()">Track Your Order →</a>
+      </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+      if (!currentUser) {
+        window.location.href = 'index.html?showLogin=1';
+      }
+      cart = loadCart();
+      function renderCart() {
+        cart = loadCart();
+        const cartData = cart;
+        const container = document.getElementById('cartItems');
+        const emptyMsg = document.getElementById('emptyMsg');
+
+        if (cartData.length === 0) {
+          container.style.display = 'none';
+          emptyMsg.style.display = 'block';
+          document.getElementById('deliveryCost').textContent = '₹0';
+          document.getElementById('totalAmount').textContent = '₹0';
+          return;
+        }
+
+        const images = [
+          'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=200&q=80',
+          'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80',
+        ];
+
+        container.innerHTML = cartData.map((item, i) => {
+          const prod = (window.shopProducts || []).find(p => p.id === item.id || p.name === item.name);
+          const img = item.image || item.img || prod?.image || prod?.img || images[i % images.length];
+          const price = item.price || (prod ? prod.price : '₹999');
+          return `
+    <div class="cart-item">
+      <img src="${img}" alt="${item.name}">
+      <div>
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${price}</div>
+      </div>
+      <button class="remove-btn" onclick="removeItem(${i})">✕</button>
+    </div>
+  `}).join('');
+
+        const subtotal = cartData.reduce((sum, item) => {
+          const priceNum = parseFloat((item.price || '999').toString().replace(/[₹$,]/g, ''));
+          return sum + (isNaN(priceNum) ? 999 : Math.round(priceNum));
+        }, 0);
+        const delivery = subtotal >= 999 ? 0 : 99;
+        document.getElementById('subtotal').textContent = '₹' + subtotal;
+        document.getElementById('deliveryCost').textContent = delivery === 0 ? 'FREE' : '₹' + delivery;
+        document.getElementById('totalAmount').textContent = '₹' + (subtotal + delivery);
+        document.getElementById('payModalTotal').textContent = '₹' + (subtotal + delivery);
+        updateCartBadge();
+      }
+
+      function removeItem(index) {
+        cart = loadCart();
+        cart.splice(index, 1);
+        saveCart();
+        renderCart();
+        showToast('Removed', 'Item removed from cart', 'info');
+      }
+      function openPayment() {
+        renderCart();
+        document.getElementById('paymentOverlay').classList.add('open');
+        document.getElementById('paymentFormSection').style.display = 'block';
+        document.getElementById('paymentSuccess').classList.remove('show');
+      }
+
+      function closePayment() {
+        document.getElementById('paymentOverlay').classList.remove('open');
+      }
+
+      function switchPayTab(tab, btn) {
+        document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+      }
+
+      let selectedUPIApp = '';
+      function selectUPI(btn, app) {
+        document.querySelectorAll('.upi-app').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedUPIApp = app;
+      }
+
+      function formatCard(input) {
+        let v = input.value.replace(/\D/g, '').substring(0, 16);
+        input.value = v.replace(/(.{4})/g, '$1 ').trim();
+      }
+
+      function formatExpiry(input) {
+        let v = input.value.replace(/\D/g, '').substring(0, 4);
+        if (v.length >= 2) v = v.substring(0, 2) + '/' + v.substring(2);
+        input.value = v;
+      }
+
+      function processPayment(method) {
+        const btn = event ? event.target : document.querySelector('.pay-panel.active .btn');
+        const originalText = btn ? btn.textContent : '';
+        if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
+
+        setTimeout(() => {
+          const total = document.getElementById('totalAmount').textContent || '₹0';
+          const order = createOrder(cart, total, method || 'card');
+          if (order) {
+            document.getElementById('successOrderId').textContent = order.id;
+          }
+          cart = [];
+          saveCart();
+
+          document.getElementById('paymentFormSection').style.display = 'none';
+          document.getElementById('paymentSuccess').classList.add('show');
+          if (btn) { btn.textContent = originalText; btn.disabled = false; }
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1800);
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        renderCart();
+      });
+    </script>
+</body>
+
+</html>

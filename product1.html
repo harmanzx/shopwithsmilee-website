@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Handmade Tote Bag — shopwithsmilee</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .product-page {
+      padding: 120px 6% 80px;
+    }
+
+    .product-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .product-images {
+      position: sticky;
+      top: 100px;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .thumb {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .thumb:hover,
+    .thumb.active {
+      border-color: var(--accent);
+    }
+
+    .product-details h1 {
+      font-size: 42px;
+      font-weight: 300;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .product-details .tag {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 20px;
+    }
+
+    .price-block {
+      font-size: 30px;
+      color: var(--accent);
+      margin-bottom: 25px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .price-block .original {
+      font-size: 18px;
+      text-decoration: line-through;
+      color: var(--text3);
+      margin-left: 12px;
+    }
+
+    .product-desc {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text2);
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 30px;
+    }
+
+    .options-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 12px;
+    }
+
+    .color-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .color-swatch:hover,
+    .color-swatch.active {
+      border-color: var(--accent);
+      transform: scale(1.15);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .product-meta {
+      border-top: 1px solid var(--border);
+      padding-top: 25px;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: var(--text3);
+    }
+
+    .product-meta div {
+      margin-bottom: 8px;
+    }
+
+    .product-meta span {
+      color: var(--text2);
+    }
+
+    .reviews-section {
+      margin-top: 80px;
+    }
+
+    .review-card {
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 15px;
+      background: var(--bg3);
+      border-radius: 2px;
+    }
+
+    .review-stars {
+      color: var(--accent);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .review-text {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    .review-author {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      letter-spacing: 1px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .product-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .product-images {
+        position: static;
+      }
+    }
+    .payment-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .payment-overlay.open {
+      display: flex;
+    }
+
+    .payment-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      width: 90%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .payment-header {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .payment-header h2 {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+
+    .payment-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .payment-body {
+      padding: 28px;
+    }
+
+    .payment-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .pay-tab {
+      flex: 1;
+      padding: 11px 8px;
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Segoe UI', sans-serif;
+      transition: var(--transition);
+    }
+
+    .pay-tab.active {
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .pay-panel {
+      display: none;
+    }
+
+    .pay-panel.active {
+      display: block;
+    }
+
+    .pay-field {
+      margin-bottom: 16px;
+    }
+
+    .pay-field label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .pay-field input,
+    .pay-field select {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    .pay-field input:focus,
+    .pay-field select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .pay-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .payment-total-bar {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+    }
+
+    .payment-total-bar .amt {
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .upi-apps {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+
+    .upi-app {
+      padding: 10px 18px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text2);
+      font-size: 13px;
+      font-family: 'Segoe UI', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: 2px;
+    }
+
+    .upi-app:hover,
+    .upi-app.selected {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pay-secure-note {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      margin-top: 12px;
+      letter-spacing: 1px;
+    }
+
+    .payment-success {
+      display: none;
+      padding: 50px 28px;
+      text-align: center;
+    }
+
+    .payment-success.show {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: popIn 0.5s ease;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0);
+      }
+
+      80% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .success-title {
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+    }
+
+    .success-id {
+      font-size: 16px;
+      color: var(--accent);
+      font-family: 'Segoe UI', sans-serif;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cursor"></div>
+  <div class="cursor-dot"></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <header>
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="shopwithsmilee">
+        <span>shopwithsmilee</span>
+      </a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="theme-toggle" onclick="toggleTheme()"></button>
+        <button class="nav-icon" onclick="window.location='cart.html'" style="position:relative;">🛒<div
+            class="cart-badge"></div></button>
+        <button class="nav-icon">👤</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="product-page">
+    <p
+      style="font-size:12px;font-family:'Segoe UI',sans-serif;color:var(--text3);letter-spacing:1px;margin-bottom:40px;">
+      <a href="index.html" 
+      style="color:var(--text3);text-decoration:none;">Home</a> ›
+      <a href="products.html" style="color:var(--text3);text-decoration:none;">Products</a> ›
+      <span style="color:var(--text2);">Handmade Tote Bag</span>
+    </p>
+
+    <div class="product-layout">
+      <div class="product-images fade">
+        <img class="main-image" id="mainImg" src="https://i.pinimg.com/1200x/9e/17/bb/9e17bbd8501a84c3ba8adc063e0e12e3.jpg"
+          alt="Product">
+        <div class="thumb-grid">
+          <img class="thumb active" src="https://i.pinimg.com/1200x/9e/17/bb/9e17bbd8501a84c3ba8adc063e0e12e3.jpg"
+            onclick="setImg(this,'https://i.pinimg.com/1200x/9e/17/bb/9e17bbd8501a84c3ba8adc063e0e12e3.jpg')">
+          <img class="thumb" src="https://i.pinimg.com/736x/29/a2/bc/29a2bcaf28a045ec51c5ee1d259fede2.jpg"
+            onclick="setImg(this,'https://i.pinimg.com/736x/29/a2/bc/29a2bcaf28a045ec51c5ee1d259fede2.jpg')">
+          <img class="thumb" src="https://i.pinimg.com/736x/29/a2/bc/29a2bcaf28a045ec51c5ee1d259fede2.jpg"
+            onclick="setImg(this,'https://i.pinimg.com/736x/29/a2/bc/29a2bcaf28a045ec51c5ee1d259fede2.jpg')">
+          <img class="thumb" src="https://i.pinimg.com/736x/29/a2/bc/29a2bcaf28a045ec51c5ee1d259fede2.jpg"
+            onclick="setImg(this,'https://i.pinimg.com/736x/29/a2/bc/29a2bcaf28a045ec51c5ee1d259fede2.jpg')">
+        </div>
+      </div>
+
+   
+      <div class="product-details fade">
+        <p class="tag">Handmade Collection</p>
+        <h1>Handmade Tote Bag</h1>
+        <div class="price-block">
+          ₹1,299 <span class="original">₹1,800</span>
+        </div>
+        <p class="product-desc">
+          A beautifully handcrafted tote bag made with premium crochet yarn. Each piece is unique — no two bags are
+          exactly alike. Perfect for everyday use, gifting, or as a stylish companion for any outfit. Eco-friendly,
+          durable, and made with love.
+        </p>
+
+        <p class="options-label">Select Color</p>
+        <div class="color-options">
+          <div class="color-swatch active" style="background:#c9a84c;" title="Gold"></div>
+          <div class="color-swatch" style="background:#4a90c4;" title="Blue"></div>
+          <div class="color-swatch" style="background:#e8d5c4;" title="Cream"></div>
+          <div class="color-swatch" style="background:#2c2c2c;" title="Charcoal"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="addToCart('Handmade Tote Bag','₹1,299')">Add to Cart 🛒</button>
+          <button class="btn btn-accent" onclick="buyNow()">Buy Now</button>
+          <button class="btn" onclick="showToast('Wishlist','Added to your wishlist ♥','success')"
+            style="padding:13px 16px;">♥</button>
+        </div>
+
+        <div class="product-meta">
+          <div>Material: <span>Premium Cotton Yarn, Eco-Friendly</span></div>
+          <div>Dimensions: <span>14" × 16" × 4"</span></div>
+          <div>Weight: <span>350g</span></div>
+          <div>Ships in: <span>2-3 business days</span></div>
+          <div>Made in: <span>India 🇮🇳</span></div>
+          <div style="margin-top:16px;">
+      
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="reviews-section fade">
+      <p class="section-label">Customer Feedback</p>
+      <h2 class="section-title" style="font-size:32px;">Reviews</h2>
+      <div class="review-card">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">Absolutely stunning bag! The quality is incredible and it arrived beautifully packaged.
+          Will definitely order again.</p>
+        <p class="review-author">— Priya S. · Verified Purchase · Mar 2026</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">I gifted this to my sister and she loved it! The craftsmanship is truly exceptional. Fast
+          shipping too.</p>
+        <p class="review-author">— Neha K. · Verified Purchase · Mar 2026</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">⭐⭐⭐⭐</div>
+        <p class="review-text">Beautiful and durable. I use it daily for work and it still looks brand new after 3
+          weeks.</p>
+        <p class="review-author">— Simran R. · Verified Purchase · Feb 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="payment-overlay" id="paymentOverlay" onclick="if(event.target===this)closePayment()">
+    <div class="payment-modal">
+      <div id="paymentFormSection">
+        <div class="payment-header">
+          <h2>🔒 Secure Checkout</h2>
+          <button class="payment-close" onclick="closePayment()">✕</button>
+        </div>
+        <div class="payment-body">
+          <div class="payment-total-bar">
+            <span>Order Total</span>
+            <span class="amt" id="payModalTotal">₹1,299</span>
+          </div>
+          <div class="payment-tabs">
+            <button class="pay-tab active" onclick="switchPayTab('card',this)">💳 Card</button>
+            <button class="pay-tab" onclick="switchPayTab('upi',this)">📱 UPI</button>
+            <button class="pay-tab" onclick="switchPayTab('netbanking',this)">🏦 Net Banking</button>
+            <button class="pay-tab" onclick="switchPayTab('cod',this)">💵 COD</button>
+          </div>
+          <div class="pay-panel active" id="panel-card">
+            <div class="pay-field">
+              <label>Card Number</label>
+              <input type="text" placeholder="4111 1111 1111 1111" maxlength="19"
+                oninput="let v=this.value.replace(/\D/g,'').substring(0,16);this.value=v.replace(/(.{4})/g,'$1 ').trim()">
+            </div>
+            <div class="pay-field">
+              <label>Cardholder Name</label>
+              <input type="text" placeholder="Name on card">
+            </div>
+            <div class="pay-field-row">
+              <div class="pay-field"><label>Expiry</label><input type="text" placeholder="MM/YY" maxlength="5"></div>
+              <div class="pay-field"><label>CVV</label><input type="text" placeholder="•••" maxlength="3"></div>
+            </div>
+            <button class="btn btn-gold" style="width:100%;" onclick="processPayment()">Pay Now</button>
+          </div>
+          <div class="pay-panel" id="panel-upi">
+            <div class="upi-apps">
+              <button class="upi-app"
+                onclick="this.parentNode.querySelectorAll('.upi-app').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">Google
+                Pay</button>
+              <button class="upi-app"
+                onclick="this.parentNode.querySelectorAll('.upi-app').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">PhonePe</button>
+              <button class="upi-app"
+                onclick="this.parentNode.querySelectorAll('.upi-app').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">Paytm</button>
+              <button class="upi-app"
+                onclick="this.parentNode.querySelectorAll('.upi-app').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">BHIM
+                UPI</button>
+            </div>
+            <div class="pay-field"><label>Or enter UPI ID</label><input type="text" placeholder="yourname@upi"></div>
+            <button class="btn btn-gold" style="width:100%;margin-top:8px;" onclick="processPayment()">Pay via
+              UPI</button>
+          </div>
+          <div class="pay-panel" id="panel-netbanking">
+            <div class="pay-field">
+              <label>Select Bank</label>
+              <select>
+                <option>-- Choose your bank --</option>
+                <option>State Bank of India</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>Axis Bank</option>
+                <option>Punjab National Bank</option>
+                <option>Kotak Mahindra Bank</option>
+              </select>
+            </div>
+            <button class="btn btn-gold" style="width:100%;margin-top:8px;" onclick="processPayment()">Proceed to
+              Bank</button>
+          </div>
+          <div class="pay-panel" id="panel-cod">
+            <div
+              style="padding:20px;background:var(--bg3);border:1px solid var(--border);margin-bottom:20px;text-align:center;">
+              <div style="font-size:40px;margin-bottom:12px;">💵</div>
+              <p style="font-size:14px;color:var(--text2);font-family:'Segoe UI',sans-serif;line-height:1.6;">Pay with
+                cash on delivery. Extra ₹49 COD fee applies.</p>
+            </div>
+            <button class="btn btn-gold" style="width:100%;" onclick="processPayment()">Confirm Cash on
+              Delivery</button>
+          </div>
+          <p class="pay-secure-note">🔒 256-bit SSL encrypted · Secured by Razorpay</p>
+        </div>
+      </div>
+      <div class="payment-success" id="paymentSuccess">
+        <div class="success-icon">✅</div>
+        <h2 class="success-title">Order Placed!</h2>
+        <p
+          style="font-size:13px;color:var(--text3);font-family:'Segoe UI',sans-serif;letter-spacing:1px;margin-bottom:6px;">
+          Your Order ID</p>
+        <p class="success-id" id="successOrderId">SWS2024XXX</p>
+        <p
+          style="font-size:13px;color:var(--text2);font-family:'Segoe UI',sans-serif;line-height:1.6;margin-bottom:24px;">
+          Thank you for shopping with <strong>shopwithsmilee</strong> 🎉<br>You'll receive a confirmation shortly.</p>
+        <button class="btn btn-gold" style="margin-bottom:12px;"
+          onclick="closePayment();window.location='index.html'">Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:60px 6%;background:var(--bg2);border-top:1px solid var(--border);">
+    <p class="section-label" style="padding:0;">More to Explore</p>
+    <h2 class="section-title" style="margin-bottom:0;">Similar Products</h2>
+    <p style="font-size:12px;color:var(--text3);font-family:'Segoe UI',sans-serif;letter-spacing:1px;margin-bottom:0;">
+      Handpicked recommendations for you</p>
+    <div id="fakestoreGrid"
+      style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;margin-top:30px;">
+      <div
+        style="text-align:center;padding:40px;color:var(--text3);font-family:'Segoe UI',sans-serif;font-size:13px;letter-spacing:2px;grid-column:1/-1;">
+        ✨ Loading...</div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    function setImg(thumb, src) {
+      document.getElementById('mainImg').src = src;
+      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+    }
+
+    function buyNow() {
+      document.getElementById('paymentOverlay').classList.add('open');
+      document.getElementById('paymentFormSection').style.display = 'block';
+      document.getElementById('paymentSuccess').classList.remove('show');
+    }
+
+    function closePayment() {
+      document.getElementById('paymentOverlay').classList.remove('open');
+    }
+
+    function switchPayTab(tab, btn) {
+      document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    function processPayment() {
+      const btn = event.target;
+      btn.textContent = '⏳ Processing...';
+      btn.disabled = true;
+      setTimeout(() => {
+        const orderId = 'SWS' + Date.now().toString().slice(-7);
+        document.getElementById('successOrderId').textContent = orderId;
+        document.getElementById('paymentFormSection').style.display = 'none';
+        document.getElementById('paymentSuccess').classList.add('show');
+        btn.disabled = false;
+      }, 1800);
+    }
+
+    async function loadSimilarProducts() {
+      const grid = document.getElementById('fakestoreGrid');
+      try {
+        const res = await fetch('https://fakestoreapi.com/products/category/jewelery');
+        const products = await res.json();
+        const extra = await fetch('https://fakestoreapi.com/products?limit=4');
+        const more = await extra.json();
+        const all = [...products, ...more].slice(0, 8);
+        grid.innerHTML = all.map(p => {
+          const inrPrice = '₹' + Math.round(p.price * 83);
+          return `
+        <div style="background:var(--bg3);border:1px solid var(--border);padding:16px;cursor:pointer;transition:var(--transition);" 
+             onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-3px)'"
+             onmouseout="this.style.borderColor='var(--border)';this.style.transform=''"
+             onclick="addToCart('${p.title.replace(/'/g, "\\'")}','${inrPrice}')">
+          <img src="${p.image}" style="width:100%;height:130px;object-fit:contain;background:#fff;padding:8px;border-radius:2px;margin-bottom:10px;" loading="lazy">
+          <p style="font-size:12px;color:var(--text2);font-family:'Segoe UI',sans-serif;margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.title}</p>
+          <p style="font-size:14px;color:var(--accent);font-family:'Segoe UI',sans-serif;font-weight:600;">${inrPrice}</p>
+          <button class="btn" style="width:100%;margin-top:10px;padding:8px;font-size:11px;" onclick="event.stopPropagation();addToCart('${p.title.replace(/'/g, "\\'")}','${inrPrice}')">Add to Cart 🛒</button>
+        </div>
+      `;
+        }).join('');
+      } catch (e) {
+        grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-family:Segoe UI,sans-serif;font-size:13px;grid-column:1/-1;">Could not load products.</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartBadge();
+      loadSimilarProducts();
+    });
+  </script>
+</body>
+
+  <footer style="background:var(--bg2);border-top:1px solid var(--border);padding:30px 6%;text-align:center;">
+    <p style="font-size:12px;color:var(--text3);font-family:'Segoe UI',sans-serif;letter-spacing:2px;">
+      shopwithsmilee — Discover Joy
+    </p>
+  </footer>
+
+</html>

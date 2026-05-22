@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shopwithsmilee — Discover Joy</title>
+  <link rel="icon" href="logo.png" type="image/png">
+
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cursor"></div>
+  <div class="cursor-dot"></div>
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      <h3>Notifications</h3>
+      <button onclick="closeNotifPanel()"
+        style="background:none;border:none;color:var(--text);cursor:pointer;font-size:18px;opacity:0.5;">✕</button>
+    </div>
+    <div id="notifList"></div>
+  </div>
+  <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeLoginModal()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeLoginModal()">✕</button>
+      <h2 id="modalTitle">Welcome Back</h2>
+      <p class="modal-subtitle" id="modalSub">Sign in to your account</p>
+      <div id="loginForm">
+        <p class="auth-error" id="loginError"></p>
+        <form onsubmit="login(event)">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPass" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%;margin-bottom:15px;">Sign In</button>
+        </form>
+        <div class="auth-switch">
+          Don't have an account? <span onclick="showAuthTab('register')">Create one</span>
+        </div>
+        <p
+          style="font-size:11px;color:var(--text3);text-align:center;margin-top:15px;font-family:'Segoe UI',sans-serif;letter-spacing:1px;">
+        </p>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <p class="auth-error" id="registerError"></p>
+        <form onsubmit="register(event)">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPass" placeholder="Create password" required>
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%;margin-bottom:15px;">Create Account</button>
+        </form>
+        <div class="auth-switch">
+          Already have an account? <span onclick="showAuthTab('login')">Sign in</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <header>
+    <nav>
+      <a href="#" class="nav-logo" onclick="closeDashboard()">
+        <img src="logo.png" alt="shopwithsmilee logo">
+        <span>shopwithsmilee</span>
+      </a>
+      <ul>
+        <li><a href="#" onclick="closeDashboard()">Home</a></li>
+        <li><a href="#products" onclick="closeDashboard()">Products</a></li>
+        <li><a href="#categories" onclick="closeDashboard()">Categories</a></li>
+        <li><a href="#contact" onclick="closeDashboard()">Contact</a></li>
+        <li><a href="#" onclick="openDashboard()" id="dashLink" style="display:none;">Dashboard</a></li>
+      </ul>
+      <div class="nav-right">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search..." oninput="searchProducts(this.value)">
+        </div>
+
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+
+        <button class="nav-icon" onclick="toggleNotifPanel()" style="position:relative;">
+          🔔
+          <div class="notif-dot" id="notifDot"></div>
+        </button>
+
+        <button class="nav-icon" onclick="window.location='cart.html'" style="position:relative;">
+          🛒
+          <div class="cart-badge"></div>
+        </button>
+
+        <button class="nav-icon" onclick="getLocation()" title="Enable location for order tracking">📍</button>
+
+        <button class="nav-icon" id="loginBtn" onclick="currentUser ? openDashboard() : openLoginModal()">👤</button>
+
+        <div class="menu-btn nav-icon" onclick="openMenu()">☰</div>
+      </div>
+    </nav>
+  </header>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span
+        style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);font-family:'Segoe UI',sans-serif;">Menu</span>
+      <button class="sidebar-close" onclick="closeMenu()">✕</button>
+    </div>
+    <ul>
+      <li onclick="closeDashboard();closeMenu();">🏠 Home</li>
+      <li onclick="openDashboard();closeMenu();">📊 Dashboard</li>
+      <li onclick="openLoginModal();closeMenu();">🔐 Login / Register</li>
+      <li onclick="logout();closeMenu();">🚪 Logout</li>
+    </ul>
+  </div>
+  <div id="overlay" onclick="closeMenu()"></div>
+  <div id="mainContent">
+    <section class="hero">
+      <div class="fade" style="text-align:center;position:relative;z-index:2;">
+        <div class="hero-logo-wrap">
+          <div class="rotating-square"></div>
+          <div class="rotating-square2"></div>
+          <img src="logo.png" class="hero-logo" alt="shopwithsmilee">
+        </div>
+        <h1>shop<span>with</span>smilee</h1>
+        <p>Discover Joy — Handmade with Love</p>
+        <button class="btn" onclick="scrollToSection('products')">Explore Collection</button>
+      </div>
+    </section>
+    <section class="section fade" id="products">
+      <p class="section-label">Curated Selection</p>
+      <h2 class="section-title">Featured</h2>
+
+      <div class="featured">
+        <a href="products.html?category=crochet" class="featured-card" onclick="goToCategory('crochet');return false;">
+          <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80" alt="Featured 1">
+          <div class="overlay">Crochet Bag</div>
+        </a>
+        <a href="products.html?category=resin" class="featured-card" onclick="goToCategory('resin');return false;">
+          <img src="https://i.pinimg.com/1200x/8d/f5/cc/8df5cc351829e4ac20a282f4208ee265.jpg" alt="Featured 2">
+          <div class="overlay">Resin Bookmark</div>
+        </a>
+        <a href="products.html?category=jewellery" class="featured-card"
+          onclick="goToCategory('jewellery');return false;">
+          <img src="https://i.pinimg.com/1200x/d7/65/47/d76547a6725f466234883b1d8cabcb10.jpg" alt="Featured 3">
+          <div class="overlay">Earrings</div>
+        </a>
+      </div>
+
+      <section class="section fade" id="wishlistSection">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+          <div>
+            <p class="section-label">My Favorites</p>
+            <h2 class="section-title">Wishlist</h2>
+          </div>
+          <div id="wishlistCount" style="font-size:14px;color:var(--text3);">0 items</div>
+        </div>
+        <div class="wishlist-preview" id="wishlistPreview" style="margin-top:24px;"></div>
+        <div style="margin-top:18px; text-align:right;">
+          <a href="wishlist.html" class="btn btn-gold">View full wishlist</a>
+        </div>
+      </section>
+
+      <div class="products-grid" id="productsGrid">
+        <a href="product.html?id=handmade-tote-bag" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://i.pinimg.com/1200x/9e/17/bb/9e17bbd8501a84c3ba8adc063e0e12e3.jpg" alt="Crochet Tote Bag">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Crochet</p>
+            <p class="card-name">Handmade Tote Bag</p>
+            <p class="card-price">₹999</p>
+          </div>
+        </a>
+
+        <a href="product.html?id=resin-bookmark" class="product-card">
+          <div class="card-img-wrap">
+            <img src='https://i.pinimg.com/1200x/8d/f5/cc/8df5cc351829e4ac20a282f4208ee265.jpg' alt="Resin Bookmark">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Resin Art</p>
+            <p class="card-name">Resin Bookmark</p>
+            <p class="card-price">₹399</p>
+          </div>
+        </a>
+
+        <a href="product.html?id=earrings" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://i.pinimg.com/1200x/d7/65/47/d76547a6725f466234883b1d8cabcb10.jpg" alt="Earrings">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Jewellery</p>
+            <p class="card-name">Earrings</p>
+            <p class="card-price">₹299</p>
+          </div>
+        </a>
+
+        <a href="product.html?id=bag" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://i.pinimg.com/1200x/82/38/9e/82389eec47c237d0fd8855c1ccf81f16.jpg" alt="Bag">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Bags & Wallets</p>
+            <p class="card-name">Bag</p>
+            <p class="card-price">₹699</p>
+          </div>
+        </a>
+
+        <a href="product.html?id=bottle" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80" alt="Bottle">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Gifts</p>
+            <p class="card-name">Bottle</p>
+            <p class="card-price">₹400</p>
+          </div>
+        </a>
+
+        <a href="product.html?id=crochet-scarf" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://i.pinimg.com/736x/49/d4/4e/49d44ee86c27da0428bfda907baa7f34.jpg" alt="Crochet Scarf">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Crochet</p>
+            <p class="card-name">Crochet Scarf</p>
+            <p class="card-price">₹799</p>
+          </div>
+        </a>
+
+        <a href="product.html?id=gift-box" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://i.pinimg.com/736x/dc/a3/c5/dca3c55ada4a19c87bbb351b8e697ade.jpg" alt="Gift Box">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Gifts</p>
+            <p class="card-name">Custom Gift Box</p>
+            <p class="card-price">₹199</p>
+          </div>
+        </a>
+
+        <a href="products.html" class="product-card">
+          <div class="card-img-wrap">
+            <img src="https://tse3.mm.bing.net/th/id/OIP.QENkMEyNWrg93ZJokPGT1wHaJP?rs=1&pid=ImgDetMain&o=7&rm=3"
+              alt="Bracelet">
+          </div>
+          <div class="card-wishlist" onclick="event.preventDefault();addToWishlistFromCard(this)">♥</div>
+          <div class="card-info">
+            <p class="card-tag">Jewellery</p>
+            <p class="card-name">Beaded Bracelet</p>
+            <p class="card-price">₹399</p>
+          </div>
+        </a>
+      </div>
+
+      <div style="text-align:center;margin-top:50px;">
+        <a href="products.html" class="btn">View All Products</a>
+      </div>
+
+
+
+      <section class="ai-section">
+        <h1>AI Assistant</h1>
+
+        <div class="ai-container">
+          <p class="ai-sub">Ask anything about products, orders, or help</p>
+
+          <div id="chatMessages" class="chat-box">
+            <div class="bot-msg">🤖 Hi! Ask me anything 👋</div>
+          </div>
+
+          <div class="chat-input-area">
+            <input id="chatInput" placeholder="Type your message..." />
+            <button onclick="askAI()">SEND</button>
+          </div>
+        </div>
+      </section>
+
+      <script>
+        async function askAI() {
+          const input = document.getElementById("chatInput");
+          const chat = document.getElementById("chatMessages");
+
+          const msg = input.value.trim();
+          if (!msg) return;
+
+          chat.innerHTML += `<div><b>You:</b> ${msg}</div>`;
+          input.value = "";
+
+          chat.innerHTML += `<div id="loading">🤖 Thinking...</div>`;
+          chat.scrollTop = chat.scrollHeight;
+
+          try {
+            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": "Bearer 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",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "http://127.0.0.1:5500",
+                "X-Title": "shopwithsmilee"
+              },
+              body: JSON.stringify({
+                model: "openrouter/auto",
+                messages: [
+                  {
+                    role: "system",
+                    content: `{
+
+You are an AI shopping assistant for shopwithsmilee. Talk like a human and suggest products only when they ask for product recommendations.
+ Ask me about products, styling tips, or anything about your orders!
+
+ONLY suggest products from this list:
+
+1. Crochet Tote Bag → product1.html
+2. Resin Art → products.html
+3. Earrings → products.html
+4. Bag → products.html
+5. Gift Box → products.html
+
+RULES:
+- Only suggest products when they ask if they ask about one product give link of that particular product.
+-use fakestore api to suggest similar products if they ask for more options.
+- Always suggest with clickable HTML links
+- Format MUST be like:
+ <a href="product1.html" target="_blank">Crochet Tote Bag</a>
+- Keep answers short (1-2 lines)
+- Be friendly
+
+Example:
+You can try this <a href="product1.html" target="_blank">Crochet Tote Bag</a> — stylish and handmade! 🎁
+`
+                  },
+                  {
+                    role: "user",
+                    content: msg
+                  }
+                ]
+              })
+            });
+
+            const data = await res.json();
+            console.log(data);
+
+            document.getElementById("loading").remove();
+
+            let reply = "No response";
+
+            if (data.choices && data.choices.length > 0) {
+              reply =
+                data.choices[0].message?.content ||
+                data.choices[0].text ||
+                "Empty reply";
+            } else if (data.error) {
+              reply = "Error: " + data.error.message;
+            }
+
+            chat.innerHTML += `<div><b>AI:</b> ${reply}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+          } catch (err) {
+            document.getElementById("loading").remove();
+            chat.innerHTML += `<div style="color:red;">⚠️ Connection error</div>`;
+          }
+        }
+      </script>
+
+      <section class="section fade" id="categories">
+        <p class="section-label">Browse by Category</p>
+        <h2 class="section-title">Shop Categories</h2>
+        <div class="categories-grid">
+          <div class="cat-card" onclick="goToCategory('crochet')"><span class="cat-icon">🧶</span>Crochet</div>
+          <div class="cat-card" onclick="goToCategory('resin')"><span class="cat-icon">🎨</span>Resin Art</div>
+          <div class="cat-card" onclick="goToCategory('jewellery')"><span class="cat-icon">💎</span>Jewellery</div>
+          <div class="cat-card" onclick="goToCategory('bags')"><span class="cat-icon">👜</span>Bags & Wallets</div>
+          <div class="cat-card" onclick="goToCategory('gifts')"><span class="cat-icon">🎁</span>Gifts</div>
+          <div class="cat-card" onclick="goToCategory('women')"><span class="cat-icon">👗</span>Women</div>
+          <div class="cat-card" onclick="goToCategory('men')"><span class="cat-icon">👔</span>Men</div>
+        </div>
+      </section>
+
+      <section class="section fade" id="tracking">
+        <p class="section-label">Track Your Package</p>
+        <h2 class="section-title">Order Tracking</h2>
+        <div class="tracking-panel">
+          <p class="tracking-subtitle">Real-time location & status updates</p>
+          <div class="tracking-input-row">
+            <input type="text" id="trackingInput" placeholder="Enter order ID (e.g. SWS2024001)">
+            <button class="btn btn-accent" onclick="openOrders()">Track Order</button>
+          </div>
+          <div id="trackingResult" class="tracking-result">
+            <p style="font-size:14px;font-family:'Segoe UI',sans-serif;color:var(--text2);margin-bottom:10px;">
+              Tracking: <strong id="trackingProduct"></strong>
+            </p>
+            <div id="trackingTimeline" class="tracking-timeline"></div>
+            <div id="trackingMap" class="track-map">
+              <div class="map-grid"></div>
+              <div id="mapPin" class="map-pin" style="left:15%;top:50%;transform:translate(-50%,-50%)">📦</div>
+              <div
+                style="position:absolute;bottom:10px;right:10px;font-size:11px;letter-spacing:1px;z-index:2;font-family:'Segoe UI',sans-serif;color:var(--text3);">
+                📡 LIVE TRACKING
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section fade" id="contact">
+        <p class="section-label">Get in Touch</p>
+        <h2 class="section-title">Contact Us</h2>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <p>We'd love to hear from you. Reach out for custom orders, collaborations, or any queries.</p>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">📧</div>
+              <span>shopwithsmilee@gmail.com</span>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">📱</div>
+              <span>+91 XXXXX XXXXX</span>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">📍</div>
+              <span>India</span>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">🕐</div>
+              <span>24/7</span>
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" placeholder="Full Name"
+                style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;width:100%;font-size:14px;font-family:'Segoe UI',sans-serif;border-radius:2px;">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="your@email.com"
+                style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;width:100%;font-size:14px;font-family:'Segoe UI',sans-serif;border-radius:2px;">
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea rows="4" placeholder="How can we help?"
+                style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;width:100%;font-size:14px;font-family:'Segoe UI',sans-serif;border-radius:2px;resize:vertical;"></textarea>
+            </div>
+
+
+            <button class="btn btn-accent"
+              onclick="showToast('Message Sent','We will get back to you shortly!','success')">Send Message</button>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <img src="logo.png" style="height:45px;">
+            <p>Handmade with love, delivered with joy. Every product at shopwithsmilee is crafted with care and passion
+              for quality.</p>
+          </div>
+          <div class="footer-col">
+            <h4>Shop</h4>
+            <ul>
+              <li>New Arrivals</li>
+              <li>Handmade Items</li>
+              <li>Art</li>
+              <li>Men/Women</li>
+              <li>Gifts</li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Help</h4>
+            <ul>
+              <li onclick="scrollToSection('tracking')">Track Order</li>
+              <li>Returns</li>
+              <li>Shipping Info</li>
+              <li onclick="scrollToSection('contact')">Contact Us</li>
+              <li>FAQs</li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Account</h4>
+            <ul>
+              <li onclick="openLoginModal()">Login</li>
+              <li onclick="showAuthTab('register');openLoginModal()">Register</li>
+              <li onclick="openDashboard()">Dashboard</li>
+              <li>Wishlist</li>
+              <li onclick="logout()">Logout</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>shopwithsmilee — Discover Joy</span>
+          <span>Made with ♥ in India</span>
+        </div>
+      </footer>
+
+  </div>
+
+  <div class="dashboard-page" id="dashboardPage" style="padding-top:70px;">
+    <div class="dashboard-layout">
+      <div class="dash-sidebar">
+        <div style="padding:20px 28px 30px;border-bottom:1px solid var(--border);margin-bottom:10px;">
+          <p style="font-size:13px;font-family:'Segoe UI',sans-serif;font-weight:600;" id="userLabel">Guest</p>
+          <p style="font-size:11px;color:var(--text3);font-family:'Segoe UI',sans-serif;letter-spacing:1px;margin-top:4px;"
+            id="userRole">User</p>
+        </div>
+        <div class="dash-sidebar-item active" data-tab="overview" onclick="switchDashTab('overview')">📊 Overview</div>
+        <div class="dash-sidebar-item" data-tab="orders" onclick="switchDashTab('orders')">📦 My Orders</div>
+        <div class="dash-sidebar-item" data-tab="track" onclick="switchDashTab('track')">📡 Track Order</div>
+        <div class="dash-sidebar-item" data-tab="profile" onclick="switchDashTab('profile')">👤 Profile</div>
+        <div class="dash-sidebar-item admin-only" data-tab="products" onclick="switchDashTab('products')">🛍️ Manage
+          Products</div>
+        <div class="dash-sidebar-item admin-only" data-tab="customers" onclick="switchDashTab('customers')">👥 Customers
+        </div>
+        <div class="dash-sidebar-item" onclick="closeDashboard()"
+          style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">🏠 Back to Store</div>
+        <div class="dash-sidebar-item" onclick="logout()" style="color:#e74c3c;">🚪 Logout</div>
+      </div>
+
+      <div class="dash-content" id="dashMainContent">
+        <h2 style="font-size:28px;font-weight:300;letter-spacing:2px;margin-bottom:30px;" id="dashTitle">Dashboard</h2>
+        <div class="dash-cards" id="dashStats"></div>
+        <div class="dash-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#SWS2024001</td>
+                <td>Crochet Bag</td>
+                <td>Mar 20</td>
+                <td>₹999</td>
+                <td><span class="status-badge status-shipped">Shipped</span></td>
+              </tr>
+              <tr>
+                <td>#SWS2024002</td>
+                <td>Resin Art Set</td>
+                <td>Mar 15</td>
+                <td>₹899</td>
+                <td><span class="status-badge status-delivered">Delivered</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+
+    function updateDashRoleLabel() {
+      const roleEl = document.getElementById('userRole');
+
+      if (roleEl && currentUser) roleEl.textContent = currentUser.role === 'admin' ? '🛡️ Administrator' : '👤 Customer';
+    }
+
+    const _origUpdateAuthUI = updateAuthUI;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateDashRoleLabel();
+      renderDashboard();
+    });
+
+  </script>
+
+</body>
+
+</html>
